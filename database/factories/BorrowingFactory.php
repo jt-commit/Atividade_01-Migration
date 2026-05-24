@@ -1,0 +1,30 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\User;
+use App\Models\Book;
+
+use App\Models\Borrowing;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Borrowing>
+ */
+class BorrowingFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition()
+    {
+        return [
+            'user_id' => User::factory(), // Cria um novo usuário ou usa um existente
+            'book_id' => Book::inRandomOrder()->first()->id, // Seleciona um livro aleatório
+            'borrowed_at' => $this->faker->dateTimeBetween('-1 month', 'now'), // Data de empréstimo
+            'returned_at' => $this->faker->optional()->dateTimeBetween('now', '+1 month'), // Data de devolução opcional
+        ];
+    }
+}

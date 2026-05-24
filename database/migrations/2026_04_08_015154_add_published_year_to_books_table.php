@@ -11,19 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('books', function (Blueprint $table) {
-            $table->integer('published_year')->nullable();
-            
-        });
+       Schema::table('books', function (Blueprint $table) {
+    $table->string('cover_image')->nullable(); // Campo para o caminho da imagem
+});
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-        Schema::table('books', function (Blueprint $table) {
-            $table->dropColumn('published_year'); 
-        });
-    }
+   public function down(): void
+{
+    Schema::table('books', function (Blueprint $table) {
+        $table->dropColumn('cover_image');
+    });
+}
 };

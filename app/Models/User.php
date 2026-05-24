@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Book;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -28,5 +29,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function books()
+    {
+        return $this->belongsToMany(Book::class, 'borrowings')
+                    ->withPivot('id', 'borrowed_at', 'returned_at')
+                    ->withTimestamps();
     }
 }
