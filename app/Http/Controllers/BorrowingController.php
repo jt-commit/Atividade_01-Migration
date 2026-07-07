@@ -14,6 +14,17 @@ class BorrowingController extends Controller
     $request->validate([
         'user_id' => 'required|exists:users,id',
     ]);
+    // Verifica se o livro já está emprestado
+$emprestimoAberto = $book->users()
+    ->wherePivotNull('returned_at')
+    ->exists();
+
+if ($emprestimoAberto) {
+    return back()->with(
+        'error',
+        'Este livro já está emprestado e ainda não foi devolvido.'
+    );
+}
 
     Borrowing::create([
         'user_id' => $request->user_id,

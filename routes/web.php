@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowingController;
+use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,43 +17,94 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
-    ->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::resource('categories', CategoryController::class);
+/*
+|--------------------------------------------------------------------------
+| Rotas para todos os usuários autenticados
+| (Clientes, Bibliotecários e Administradores)
+|--------------------------------------------------------------------------
+*/
 
-Route::resource('authors', AuthorController::class);
+Route::middleware('auth')->group(function () {
 
-Route::resource('publishers', PublisherController::class);
+    // Visualização
+    Route::resource('books', BookController::class)
+        ->only(['index', 'show']);
 
-// Rotas dos livros
-Route::get('/books/create-id-number',
-    [BookController::class, 'createWithId']
-)->name('books.create.id');
+    Route::resource('authors', AuthorController::class)
+        ->only(['index', 'show']);
 
-Route::post('/books/create-id-number',
-    [BookController::class, 'storeWithId']
-)->name('books.store.id');
+    Route::resource('categories', CategoryController::class)
+        ->only(['index', 'show']);
 
-Route::get('/books/create-select',
-    [BookController::class, 'createWithSelect']
-)->name('books.create.select');
+    Route::resource('publishers', PublisherController::class)
+        ->only(['index', 'show']);
 
-Route::post('/books/create-select',
-    [BookController::class, 'storeWithSelect']
-)->name('books.store.select');
+    // Histórico de empréstimos do usuário
+    Route::get('/users/{user}/borrowings',
+        [BorrowingController::class, 'userBorrowings'])
+        ->name('users.borrowings');
+});
 
-Route::resource('books', BookController::class)
-    ->except(['create', 'store']);
+/*
+|--------------------------------------------------------------------------
+| Rotas para Admin e Bibliotecário
+|--------------------------------------------------------------------------
+*/
 
-    Route::resource('users', UserController::class)->except(['create', 'store', 'destroy']);
+Route::middleware(['auth', 'role:admin,bibliotecario'])->group(function () {
 
-    // Rota para registrar um empréstimo
-Route::post('/books/{book}/borrow', [BorrowingController::class, 'store'])->name('books.borrow');
+    // Livros
+    Route::get('/books/create-id-number',
+        [BookController::class, 'createWithId'])
+        ->name('books.create.id');
 
-// Rota para listar o histórico de empréstimos de um usuário
-Route::get('/users/{user}/borrowings', [BorrowingController::class, 'userBorrowings'])->name('users.borrowings');
+    Route::post('/books/create-id-number',
+        [BookController::class, 'storeWithId'])
+        ->name('books.store.id');
 
-// Rota para registrar a devolução
-Route::patch('/borrowings/{borrowing}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');
+    Route::get('/books/create-select',
+        [BookController::class, 'createWithSelect'])
+        ->name('books.create.select');
 
+    Route::post('/books/create-select',
+        [BookController::class, 'storeWithSelect'])
+        ->name('books.store.select');
+
+    Route::resource('books', BookController::class)
+        ->except(['index', 'show']);
+
+    // Autores
+    Route::resource('authors', AuthorController::class)
+        ->except(['index', 'show']);
+
+    // Categorias
+    Route::resource('categories', CategoryController::class)
+        ->except(['index', 'show']);
+
+    // Editoras
+    Route::resource('publishers', PublisherController::class)
+        ->except(['index', 'show']);
+
+    // Empréstimos
+    Route::post('/books/{book}/borrow',
+        [BorrowingController::class, 'store'])
+        ->name('books.borrow');
+
+    Route::patch('/borrowings/{borrowing}/return',
+        [BorrowingController::class, 'returnBook'])
+        ->name('borrowings.return');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Rotas somente para Administrador
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::resource('users', UserController::class);
+
+});

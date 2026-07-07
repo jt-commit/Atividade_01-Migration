@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
        Schema::table('books', function (Blueprint $table) {
-    $table->string('cover_image')->nullable(); // Campo para o caminho da imagem
+    $table->string('published_year')->nullable(); // Campo para o caminho da imagem
 });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
    public function down(): void
 {
     Schema::table('books', function (Blueprint $table) {
-        $table->dropColumn('cover_image');
+        $table->dropColumn('published_year');
     });
 }
 };
