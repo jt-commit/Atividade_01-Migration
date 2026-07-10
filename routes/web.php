@@ -108,3 +108,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class);
 
 });
+
+
+
+/*ROTA PARA QUITAR DEBITO*/ 
+Route::patch(
+    '/users/{user}/pay-debt',
+    [UserController::class,'payDebt']
+)->name('users.payDebt');

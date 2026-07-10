@@ -47,4 +47,15 @@ class UserController extends Controller
             ->route('users.index')
             ->with('success', 'Usuário atualizado com sucesso.');
     }
+    public function payDebt(User $user)
+{
+    $user->update([
+        'debit' => 0
+    ]);
+
+    return back()->with(
+        'success',
+        'Multa quitada com sucesso.'
+    );
+}
 }

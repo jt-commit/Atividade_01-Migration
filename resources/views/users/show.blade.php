@@ -14,6 +14,28 @@
             <p><strong>Email:</strong> {{ $user->email }}</p>
         </div>
     </div>
+    <p>
+
+    <strong>Débito:</strong>
+
+    R$ {{ number_format($user->debit,2,',','.') }}
+</p>
+@if($user->debit > 0)
+
+<form action="{{ route('users.payDebt',$user) }}" method="POST">
+
+    @csrf
+    @method('PATCH')
+
+    <button class="btn btn-success">
+
+        Quitar Multa
+
+    </button>
+
+</form>
+
+@endif
 
     <!-- Histórico de Empréstimos -->
     <div class="card mb-4">
